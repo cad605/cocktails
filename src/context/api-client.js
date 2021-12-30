@@ -4,15 +4,15 @@ import {
   ApolloProvider,
   useQuery,
   gql,
-} from "@apollo/client";
+} from '@apollo/client'
 
-function ClientProvider() {
+function ClientProvider(props) {
   const client = new ApolloClient({
-    uri: "https://48p1r2roz4.sse.codesandbox.io",
+    uri: 'https://48p1r2roz4.sse.codesandbox.io',
     cache: new InMemoryCache(),
-  });
+  })
 
-  return <ApolloProvider client={client}></ApolloProvider>;
+  return <ApolloProvider client={client} {...props}></ApolloProvider>
 }
 
-export { ClientProvider };
+export {ClientProvider}

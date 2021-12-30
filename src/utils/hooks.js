@@ -5,7 +5,7 @@ import {
   useReducer,
   useCallback,
   useLayoutEffect,
-} from "react";
+} from 'react'
 
 /**
  * `useSafeDispatch` takes a `dispatch` function from `useReducer` and
@@ -15,20 +15,20 @@ import {
  * @returns memoized callback function
  */
 function useSafeDispatch(dispatch) {
-  const mounted = useRef(false);
+  const mounted = useRef(false)
 
   useLayoutEffect(() => {
-    mounted.current = true;
-    return (mounted.current = false);
-  }, []);
+    mounted.current = true
+    return () => (mounted.current = false)
+  }, [])
 
   return useCallback(
     (...args) => (mounted.current ? dispatch(...args) : void 0),
-    [dispatch]
-  );
+    [dispatch],
+  )
 }
 
-const defaultInitialState = { status: "idle", data: null, error: null };
+const defaultInitialState = {status: 'idle', data: null, error: null}
 /**
  * `useAsync` accepts an optional `initalState` to initialize the reducer.
  * It returns a `run` function that takes a promise, runs it, and
@@ -41,57 +41,55 @@ function useAsync(initalState) {
   const initalStateRef = useRef({
     ...defaultInitialState,
     ...initalState,
-  });
+  })
 
-  const asyncReducer = (state, newState) => ({ ...state, ...newState });
+  const [{status, data, error}, dispatch] = useReducer(
+    (state, newState) => ({...state, ...newState}),
+    initalStateRef.current,
+  )
 
-  const [{ status, data, error }, dispatch] = useReducer(
-    asyncReducer,
-    initalStateRef.current
-  );
-
-  const safeDispatch = useSafeDispatch(dispatch);
+  const safeDispatch = useSafeDispatch(dispatch)
 
   const setData = useCallback(
-    (data) => safeDispatch({ data, status: "resolved" }),
-    [safeDispatch]
-  );
+    data => safeDispatch({data, status: 'resolved'}),
+    [safeDispatch],
+  )
   const setError = useCallback(
-    (error) => safeDispatch({ error, status: "rejected" }),
-    [safeDispatch]
-  );
+    error => safeDispatch({error, status: 'rejected'}),
+    [safeDispatch],
+  )
   const reset = useCallback(
     () => safeDispatch(initalStateRef.current),
-    [safeDispatch]
-  );
+    [safeDispatch],
+  )
 
   const run = useCallback(
-    (promise) => {
+    promise => {
       if (!promise || !promise.then) {
         throw new Error(
-          `The argument passed to useAsync().run must be a promise. Maybe a function that's passed isn't returning anything?`
-        );
+          `The argument passed to useAsync().run must be a promise. Maybe a function that's passed isn't returning anything?`,
+        )
       }
 
-      safeDispatch({ status: "pending" });
+      safeDispatch({status: 'pending'})
 
       return promise.then(
-        (data) => {
-          setData(data);
+        data => {
+          setData(data)
         },
-        (error) => {
-          setError(error);
-        }
-      );
+        error => {
+          setError(error)
+        },
+      )
     },
-    [safeDispatch, setData, setError]
-  );
+    [safeDispatch, setData, setError],
+  )
 
   return {
-    isIdle: status === "idle",
-    isLoading: status === "pending",
-    isError: status === "rejected",
-    isSuccess: status === "resolved",
+    isIdle: status === 'idle',
+    isLoading: status === 'pending',
+    isError: status === 'rejected',
+    isSuccess: status === 'resolved',
 
     setData,
     setError,
@@ -100,36 +98,36 @@ function useAsync(initalState) {
     data,
     run,
     reset,
-  };
+  }
 }
 
 function useLocalStorageState(
   key,
-  defaultValue = "",
-  { serialize = JSON.stringify, deserialize = JSON.parse } = {}
+  defaultValue = '',
+  {serialize = JSON.stringify, deserialize = JSON.parse} = {},
 ) {
   const [state, setState] = useState(() => {
-    const localStorageValue = window.localStorage.getItem(key);
+    const localStorageValue = window.localStorage.getItem(key)
 
     if (localStorageValue) {
-      return deserialize(localStorageValue);
+      return deserialize(localStorageValue)
     }
 
-    return typeof defaultValue === "function" ? defaultValue() : defaultValue;
-  });
+    return typeof defaultValue === 'function' ? defaultValue() : defaultValue
+  })
 
-  const prevKeyRef = useRef(key);
+  const prevKeyRef = useRef(key)
 
   useEffect(() => {
-    const prevKey = prevKeyRef.current;
+    const prevKey = prevKeyRef.current
     if (prevKey !== key) {
-      window.localStorage.removeItem(prevKey);
+      window.localStorage.removeItem(prevKey)
     }
-    prevKeyRef.current = key;
-    window.localStorage.setItem(key, serialize(state));
-  }, [key, serialize, state]);
+    prevKeyRef.current = key
+    window.localStorage.setItem(key, serialize(state))
+  }, [key, serialize, state])
 
-  return [state, setState];
+  return [state, setState]
 }
 
-export { useAsync, useLocalStorageState };
+export {useAsync, useLocalStorageState}
