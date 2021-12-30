@@ -88,7 +88,6 @@ function useAsync(initalState) {
   );
 
   return {
-    // using the same names that react-query uses for convenience
     isIdle: status === "idle",
     isLoading: status === "pending",
     isError: status === "rejected",
@@ -104,13 +103,6 @@ function useAsync(initalState) {
   };
 }
 
-/**
- * 
- * @param {*} key
- * @param {*} defaultValue
- * @param {*} param2
- * @returns
- */
 function useLocalStorageState(
   key,
   defaultValue = "",

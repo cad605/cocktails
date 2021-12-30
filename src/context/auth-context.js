@@ -5,25 +5,24 @@ import {
   useEffect,
   useMemo,
 } from "react";
-import { useAsync } from "../utils/hooks";
+import { useAsync } from "utils/hooks";
 import * as auth from "auth-provider";
 
 async function bootstrapAppData() {
-  let user = null;
+  // let user = null;
 
-  const token = await auth.getToken();
-  if (token) {
-    //...do something like getUser()
-    //   const data = await client('bootstrap', {token})
-    //   queryCache.setQueryData('list-items', data.listItems, {
-    //     staleTime: 5000,
-    //   })
-    //   for (const listItem of data.listItems) {
-    //     setQueryDataForBook(listItem.book)
-    //   }
-    //   user = data.user
-  }
-  return user;
+  // const token = await auth.getToken();
+  // if (token) {
+  //     const data = await client('bootstrap', {token})
+  //     queryCache.setQueryData('list-items', data.listItems, {
+  //       staleTime: 5000,
+  //     })
+  //     for (const listItem of data.listItems) {
+  //       setQueryDataForBook(listItem.book)
+  //     }
+  //     user = data.user
+  // }
+  // return user;
 }
 
 const AuthContext = createContext();
@@ -40,7 +39,7 @@ function AuthProvider(props) {
     isSuccess,
     run,
     setData,
-  } = useAsync();
+  } = useAsync({ status: "idle", data: {username: 'Chris'}, error: null });
 
   useEffect(() => {
     const appDataPromise = bootstrapAppData();
